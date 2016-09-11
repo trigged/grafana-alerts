@@ -29,7 +29,8 @@ class AlertCheckerCoordinator:
                                                 smtp_server=self.configuration.smtp_server,
                                                 smtp_port=self.configuration.smtp_port,
                                                 email_username=self.configuration.smtp_username,
-                                                email_password=self.configuration.smtp_password)
+                                                email_password=self.configuration.smtp_password,
+                                                webhook=self.configuration.webhook)
 
     def check(self):
         """Check if there is something to report"""

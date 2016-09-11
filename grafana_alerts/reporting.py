@@ -2,10 +2,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import hashlib
 import os
+import json
 import pickle
 import smtplib
 import datetime
-
+import urllib2
 import pkg_resources
 
 __author__ = 'Pablo Alcaraz'
@@ -52,7 +53,7 @@ class BaseAlertReporter:
 
 
 class MailAlertReporter(BaseAlertReporter):
-    def __init__(self, email_from, smtp_server, smtp_port, email_username=None, email_password=None):
+    def __init__(self, email_from, smtp_server, smtp_port, email_username=None, email_password=None, webhook=None):
         self.email_from = email_from
         self.smtp_server = smtp_server
         self.smtp_port = smtp_port
@@ -60,6 +61,7 @@ class MailAlertReporter(BaseAlertReporter):
         self.email_password = email_password
         # TODO remove
         self.sent_emails_counter = 0
+        self.webhook = webhook
 
     def report(self, reported_alerts):
         """filter the reported alerts by the configured criteria and if there is some alert to send,
@@ -68,7 +70,20 @@ class MailAlertReporter(BaseAlertReporter):
         diff_report = self._generated_diff_report(filtered_reported_alert)
         # TODO keys should have better names.
         alerts_to_send_map = self._group_by(diff_report, 'alert_destination')
-        self._send_alerts_if_any(alerts_to_send_map)
+        if self.webhook:
+            self.send_Webhooks(alerts_to_send_map)
+        else:
+            self._send_alerts_if_any(alerts_to_send_map)
+
+    def send_Webhooks(self, alerts_to_send_map):
+        data = json.dumps(alerts_to_send_map, default=lambda o: o.__dict__)
+        request = urllib2.Request(self.webhook, data, {'Content-Type': 'application/json'})
+        try:
+            contents = urllib2.urlopen(request).read()
+            print 'send webHooks result', contents
+        except BaseException as ex:
+            print ex
+        pass
 
     def _filter_current_reported_alerts(self, reported_alerts):
         """Filter current reported alerts"""

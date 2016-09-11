@@ -28,6 +28,7 @@ class Configuration:
         self.smtp_port = 25
         self.smtp_username = None
         self.smtp_password = None
+        self.webhook = ''
         self.read_config()
 
     def read_config(self):

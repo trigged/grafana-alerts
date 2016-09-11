@@ -50,8 +50,7 @@ class DashboardTest(BaseAlertingTest):
         slug = 'typrod-storage'
         tags = []
         console_alert_reporter = ConsoleAlertReporter()
-        dashboard = Dashboard(grafana_url=grafana_url,
-                              grafana_token=grafana_token, title=title, slug=slug, tags=tags)
+        dashboard = Dashboard(grafana_url=grafana_url, grafana_token=grafana_token, title=title, slug=slug, tags=tags)
         self.assertIsNotNone(dashboard)
 
         # when
@@ -67,13 +66,8 @@ class AlertCheckerTest(BaseAlertingTest):
     def test_check_undefined_alert_criteria(self):
         # given
         title = 'TyProd Storage'
-        grafana_targets = [{u'hide': False,
-                            u'target': u"aliasByNode(exclude(typrod.*.disk_free_percent_rootfs.sum, '__SummaryInfo__'), 1)"}]
-        alert_conditions = [
-            ["50<=x<=100", "normal", "pablo@ailive.net"],
-            ["35<x<50", "warning", "pablo@ailive.net"],
-            ["x<=35", "critical", "pablo@ailive.net"]
-        ]
+        grafana_targets = [{u'hide': False, u'target': u"aliasByNode(exclude(typrod.*.disk_free_percent_rootfs.sum, '__SummaryInfo__'), 1)"}]
+        alert_conditions = [["50<=x<=100", "normal", "pablo@ailive.net"], ["35<x<50", "warning", "pablo@ailive.net"], ["x<=35", "critical", "pablo@ailive.net"]]
         alert_checker = AlertChecker(grafana_url, grafana_token, title, grafana_targets)
         alert_checker.set_alert_conditions(alert_conditions=alert_conditions)
         self.assertIsNotNone(alert_checker)
@@ -107,5 +101,5 @@ class MailAlertReportedWithMockedMailServer(MailAlertReporter):
     def _send_email(self, email, email_to_string):
         self.sent_emails_counter+=1
 
-# if __name__ == '__main__':
-#     unittest.main()
+if __name__ == '__main__':
+    unittest.main()
